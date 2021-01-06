@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -25,9 +26,9 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var m3DView: GLSurfaceView
 
     // Sensors
-    private val mSensorManager: SensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-    private val mAccelerometer: Sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    private val mMagneticField: Sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+    private lateinit var sensorManager: SensorManager
+    private lateinit var accelerometer: Sensor
+    private lateinit var magneticField: Sensor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,10 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         // init opengl surface view
         m3DView.setRenderer(opglr)
 
+        // Get sensors
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
     }
 
     /*
@@ -59,26 +64,26 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
         more information on rotation matrix can be found online:
         https://developer.android.com/reference/android/hardware/SensorManager.html#getRotationMatrix(float[],%20float[],%20float[],%20float[])
     */
-    
+
     override fun onResume() {
         super.onResume()
         // Register to sensors update
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL)
-        mSensorManager.registerListener(this, mMagneticField, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     override fun onPause() {
         super.onPause()
         // Unregister to sensors update
-        mSensorManager.unregisterListener(this)
+        sensorManager.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
+        // 0 = Unreliable, 1 = Low accuracy, 2 = Medium accuracy, 3 = High accuracy
+        Log.i("CompassActivity", "Accuracy of sensor $sensor changed to $accuracy")
     }
-
 }
