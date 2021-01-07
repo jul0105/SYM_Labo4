@@ -30,6 +30,11 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var accelerometer: Sensor
     private lateinit var magneticField: Sensor
 
+    // Sensors data
+    private var accelerometerData = FloatArray(3)
+    private var magneticFieldData = FloatArray(3)
+    private var rotationMatrix = FloatArray(16)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,11 +84,21 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        // Set sensors value
+        when (event?.sensor?.type) {
+            Sensor.TYPE_ACCELEROMETER -> accelerometerData = event.values
+            Sensor.TYPE_MAGNETIC_FIELD -> magneticFieldData = event.values
+        }
 
+        // Get rotation matrix
+        SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerData, magneticFieldData)
+
+        // Swap rotation matrix
+        rotationMatrix = opglr.swapRotMatrix(rotationMatrix)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         // 0 = Unreliable, 1 = Low accuracy, 2 = Medium accuracy, 3 = High accuracy
-        Log.i("CompassActivity", "Accuracy of sensor $sensor changed to $accuracy")
+        Log.i("CompassActivity", "Accuracy of sensor '${sensor?.name}' changed to $accuracy")
     }
 }
