@@ -73,8 +73,8 @@ class CompassActivity : AppCompatActivity(), SensorEventListener {
     override fun onResume() {
         super.onResume()
         // Register to sensors update
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
-        sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_UI)
     }
 
     override fun onPause() {
