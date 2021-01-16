@@ -1,20 +1,27 @@
 package ch.heigvd.iict.sym_labo4
 
-import ch.heigvd.iict.sym_labo4.abstractactivies.BaseTemplateActivity
 import android.bluetooth.BluetoothAdapter
-import ch.heigvd.iict.sym_labo4.viewmodels.BleOperationsViewModel
-import ch.heigvd.iict.sym_labo4.adapters.ResultsAdapter
-import android.os.Bundle
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.*
-import androidx.lifecycle.ViewModelProvider
-import android.os.Handler
-import android.os.Looper
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanFilter.Builder
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
+import android.os.*
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ListView
+import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModelProvider
+import ch.heigvd.iict.sym_labo4.abstractactivies.BaseTemplateActivity
+import ch.heigvd.iict.sym_labo4.adapters.ResultsAdapter
+import ch.heigvd.iict.sym_labo4.viewmodels.BleOperationsViewModel
+import java.util.*
+
 
 /**
  * Project: Labo4
@@ -140,6 +147,7 @@ class BleActivity : BaseTemplateActivity() {
     }
 
     //this method need user granted localisation permission, our demo app is requesting it on MainActivity
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun scanLeDevice(enable: Boolean) {
         val bluetoothScanner = bluetoothAdapter.bluetoothLeScanner
 
@@ -154,9 +162,16 @@ class BleActivity : BaseTemplateActivity() {
             // TODO ajouter un filtre pour n'afficher que les devices proposant
             // le service "SYM" (UUID: "3c0a1000-281d-4b48-b2a7-f15579a1c38f")
 
+
+            val filter = Builder().setServiceUuid(ParcelUuid.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f")).build();
+            var filters: ArrayList<ScanFilter>? = ArrayList(1)
+
+            if (filters != null) {
+                filters.add(filter)
+            }
             //reset display
             scanResultsAdapter.clear()
-            bluetoothScanner.startScan(null, builderScanSettings.build(), leScanCallback)
+            bluetoothScanner.startScan(filters, builderScanSettings.build(), leScanCallback)
             Log.d(TAG, "Start scanning...")
             isScanning = true
 
@@ -173,7 +188,9 @@ class BleActivity : BaseTemplateActivity() {
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
-            runOnUiThread { scanResultsAdapter.addDevice(result) }
+            runOnUiThread {
+
+                scanResultsAdapter.addDevice(result) }
         }
     }
 
