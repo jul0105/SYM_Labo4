@@ -98,6 +98,7 @@ class BleActivity : BaseTemplateActivity() {
         })
         //ble events
         bleViewModel.isConnected.observe(this, { updateGui() })
+        bleViewModel.temperature.observe(this, { updateGui() })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -144,7 +145,7 @@ class BleActivity : BaseTemplateActivity() {
                 scanMenuBtn!!.isVisible = false
                 disconnectMenuBtn!!.isVisible = true
             }
-            temperatureTextView.text = bleViewModel.temperature.value + "°"
+            temperatureTextView.text = bleViewModel.temperature.value.toString();
         } else {
             operationPanel.visibility = View.GONE
             scanPanel.visibility = View.VISIBLE

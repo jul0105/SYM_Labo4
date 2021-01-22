@@ -139,12 +139,12 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
 
                         timeService = mConnection!!.getService(TIMESERVICE);
                         //currentTimeChar = mConnection!!.getService(CURRENT_TIME_SERVICE).getCharacteristic(CURRENT_TIME);
-                        for(i in gatt.services) {
-                            when(i.uuid) {
+                        for (i in gatt.services) {
+                            when (i.uuid) {
                                 TIMESERVICE -> {
-                                  timeService = i;
-                                    for(j in i.characteristics) {
-                                        when(j.uuid)  {
+                                    timeService = i;
+                                    for (j in i.characteristics) {
+                                        when (j.uuid) {
                                             CURRENTTIMECHAR -> {
                                                 currentTimeChar = j;
                                             }
@@ -153,8 +153,8 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                                 }
                                 SYMSERVICE -> {
                                     symService = i;
-                                    for(j in i.characteristics) {
-                                        when(j.uuid)  {
+                                    for (j in i.characteristics) {
+                                        when (j.uuid) {
                                             INTEGERCHAR -> {
                                                 integerChar = j;
                                             }
@@ -246,13 +246,16 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                 des MutableLiveData
                 On placera des méthodes similaires pour les autres opérations
             */
-            if(temperatureChar != null) {
-                readCharacteristic(temperatureChar).with{_: BluetoothDevice, data: Data ->
-                    temperature.postValue(data.getIntValue(Data.FORMAT_UINT16,0)?.div(10).toString())
+            return if (temperatureChar != null) {
+                readCharacteristic(temperatureChar).with { _: BluetoothDevice, data: Data -> kotlin.run {
+                    temperature.postValue(data.getIntValue(Data.FORMAT_UINT16, 0)?.div(10).toString())
+                    
+                    log(0,data.getIntValue(Data.FORMAT_UINT16, 0)?.div(10).toString())
+                }
                 }.enqueue()
-                return true
+                true
             } else {
-                return false;
+                false
             }
         }
     }
