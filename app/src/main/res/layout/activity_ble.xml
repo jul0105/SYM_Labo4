@@ -19,6 +19,17 @@
 
             <!-- TODO vous placerez dans ce layout toutes les vues nécessaires aux intéractions avec le périphérique BLE -->
 
+            <Button
+                android:id="@+id/temperatureButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button" />
+
+            <TextView
+                android:id="@+id/temperatureTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
         </LinearLayout>
 
     </ScrollView>
@@ -32,7 +43,9 @@
             android:id="@+id/ble_scanresults"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical" />
+            android:scrollbars="vertical" >
+
+        </ListView>
 
         <TextView
             android:id="@+id/ble_scanresults_empty"

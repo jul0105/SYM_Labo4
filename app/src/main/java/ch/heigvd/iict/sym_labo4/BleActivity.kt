@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -42,6 +43,8 @@ class BleActivity : BaseTemplateActivity() {
     private lateinit var scanResults: ListView
     private lateinit var emptyScanResults: TextView
 
+    private lateinit var temperatureTextView: TextView
+    private lateinit var temperatureButton: Button
     //menu elements
     private var scanMenuBtn: MenuItem? = null
     private var disconnectMenuBtn: MenuItem? = null
@@ -67,6 +70,10 @@ class BleActivity : BaseTemplateActivity() {
         scanResults = findViewById(R.id.ble_scanresults)
         emptyScanResults = findViewById(R.id.ble_scanresults_empty)
 
+        // received data display
+        temperatureTextView = findViewById(R.id.temperatureTextView)
+        temperatureButton = findViewById(R.id.temperatureButton)
+
         //manage scanned item
         scanResultsAdapter = ResultsAdapter(this)
         scanResults.adapter = scanResultsAdapter
@@ -86,7 +93,9 @@ class BleActivity : BaseTemplateActivity() {
                 bleViewModel.connect(scanResultsAdapter.getItem(position).device)
             }
         }
-
+        temperatureButton.setOnClickListener({
+            bleViewModel.readTemperature()
+        })
         //ble events
         bleViewModel.isConnected.observe(this, { updateGui() })
     }
@@ -135,6 +144,7 @@ class BleActivity : BaseTemplateActivity() {
                 scanMenuBtn!!.isVisible = false
                 disconnectMenuBtn!!.isVisible = true
             }
+            temperatureTextView.text = bleViewModel.temperature.value + "°"
         } else {
             operationPanel.visibility = View.GONE
             scanPanel.visibility = View.VISIBLE

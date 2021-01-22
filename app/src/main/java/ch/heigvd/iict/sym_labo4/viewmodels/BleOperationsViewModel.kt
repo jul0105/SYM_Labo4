@@ -11,7 +11,9 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import no.nordicsemi.android.ble.BleManager
+import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
+import java.util.*
 
 /**
  * Project: Labo4
@@ -26,7 +28,9 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
 
     //live data - observer
     val isConnected = MutableLiveData(false)
-
+    val date = MutableLiveData("D/M/Y-hh:mm:ss")
+    val temperature = MutableLiveData("temp")
+    val click = MutableLiveData(0)
     //Services and Characteristics of the SYM Pixl
     private var timeService: BluetoothGattService? = null
     private var symService: BluetoothGattService? = null
@@ -34,6 +38,17 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
     private var integerChar: BluetoothGattCharacteristic? = null
     private var temperatureChar: BluetoothGattCharacteristic? = null
     private var buttonClickChar: BluetoothGattCharacteristic? = null
+
+    //UUIDs des services
+    private val TIMESERVICE = UUID.fromString("00001805-0000-1000-8000-00805f9b34fb")
+    private val SYMSERVICE = UUID.fromString("3c0a1000-281d-4b48-b2a7-f15579a1c38f")
+
+    private val CURRENTTIMECHAR = UUID.fromString("00002A2B-0000-1000-8000-00805f9b34fb")
+    private val INTEGERCHAR = UUID.fromString("3c0a1001-281d-4b48-b2a7-f15579a1c38f")
+    private val TEMPERATURECHAR = UUID.fromString("3c0a1002-281d-4b48-b2a7-f15579a1c38f")
+    private val BUTTONCLICKCHAR = UUID.fromString("3c0a1003-281d-4b48-b2a7-f15579a1c38f")
+
+
 
     override fun onCleared() {
         super.onCleared()
@@ -121,7 +136,42 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
 
                         Log.d(TAG, "isRequiredServiceSupported - TODO")
 
-                        /* TODO
+
+                        timeService = mConnection!!.getService(TIMESERVICE);
+                        //currentTimeChar = mConnection!!.getService(CURRENT_TIME_SERVICE).getCharacteristic(CURRENT_TIME);
+                        for(i in gatt.services) {
+                            when(i.uuid) {
+                                TIMESERVICE -> {
+                                  timeService = i;
+                                    for(j in i.characteristics) {
+                                        when(j.uuid)  {
+                                            CURRENTTIMECHAR -> {
+                                                currentTimeChar = j;
+                                            }
+                                        }
+                                    }
+                                }
+                                SYMSERVICE -> {
+                                    symService = i;
+                                    for(j in i.characteristics) {
+                                        when(j.uuid)  {
+                                            INTEGERCHAR -> {
+                                                integerChar = j;
+                                            }
+                                            BUTTONCLICKCHAR -> {
+                                                buttonClickChar = j;
+                                            }
+                                            TEMPERATURECHAR -> {
+                                                temperatureChar = j;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                        /*
                         - Nous devons vérifier ici que le périphérique auquel on vient de se connecter possède
                           bien tous les services et les caractéristiques attendues, on vérifiera aussi que les
                           caractéristiques présentent bien les opérations attendues
@@ -129,7 +179,8 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                           caractéristiques (déclarés en lignes 39 à 44)
                         */
 
-                        return false //FIXME si tout est OK, on retourne true, sinon la librairie appelera la méthode onDeviceDisconnected() avec le flag REASON_NOT_SUPPORTED
+
+                        return (timeService != null && symService != null && currentTimeChar != null && integerChar != null && buttonClickChar != null && temperatureChar != null);
                     }
 
                     override fun initialize() {
@@ -139,6 +190,39 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                             Dans notre cas il s'agit de s'enregistrer pour recevoir les notifications proposées par certaines
                             caractéristiques, on en profitera aussi pour mettre en place les callbacks correspondants.
                          */
+                        setNotificationCallback(currentTimeChar).with { _: BluetoothDevice, data: Data ->
+                            val year = data.getIntValue(Data.FORMAT_UINT16, 0).toString()
+                            var month = data.getIntValue(Data.FORMAT_UINT8, 2).toString()
+                            var day = data.getIntValue(Data.FORMAT_UINT8, 3).toString()
+
+                            var hour = data.getIntValue(Data.FORMAT_UINT8, 4).toString()
+                            var min = data.getIntValue(Data.FORMAT_UINT8, 5).toString()
+                            var sec = data.getIntValue(Data.FORMAT_UINT8, 6).toString()
+
+                            if (month.toInt() < 10) {
+                                month = "0$month"
+                            }
+                            if (day.toInt() < 10) {
+                                day = "0$day"
+                            }
+                            if (hour.toInt() < 10) {
+                                hour = "0$hour"
+                            }
+                            if (min.toInt() < 10) {
+                                min = "0$min"
+                            }
+                            if (sec.toInt() < 10) {
+                                sec = "0$sec"
+                            }
+
+                            date.postValue("$day/$month/$year.$hour:$min:$sec")
+                        }
+                        enableNotifications(currentTimeChar).enqueue()
+
+                        setNotificationCallback(buttonClickChar).with { _: BluetoothDevice, data: Data ->
+                            click.postValue(data.getIntValue(Data.FORMAT_UINT8, 0))
+                        }
+                        enableNotifications(buttonClickChar).enqueue()
                     }
 
                     override fun onDeviceDisconnected() {
@@ -162,7 +246,14 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
                 des MutableLiveData
                 On placera des méthodes similaires pour les autres opérations
             */
-            return false //FIXME
+            if(temperatureChar != null) {
+                readCharacteristic(temperatureChar).with{_: BluetoothDevice, data: Data ->
+                    temperature.postValue(data.getIntValue(Data.FORMAT_UINT16,0)?.div(10).toString())
+                }.enqueue()
+                return true
+            } else {
+                return false;
+            }
         }
     }
 
