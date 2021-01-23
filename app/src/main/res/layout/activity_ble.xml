@@ -23,13 +23,51 @@
                 android:id="@+id/temperatureButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Button" />
+                android:text="Show tempereture" />
 
             <TextView
                 android:id="@+id/temperatureTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="tempereture" />
+
+            <TextView
+                android:id="@+id/nbHitButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="number hits buttons" />
+
+            <TextView
+                android:id="@+id/sendIntTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="send int : " />
+
+            <EditText
+                android:id="@+id/sendIntEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"/>
+
+            <Button
+                android:id="@+id/sendButton"
+                android:layout_width="165dp"
+                android:layout_height="wrap_content"
+                android:text="Send" />
+
+            <TextView
+                android:id="@+id/currDateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Current Date" />
+
+            <Button
+                android:id="@+id/syncDateButton"
+                android:layout_width="162dp"
+                android:layout_height="wrap_content"
+                android:text="SyncDate" />
+
         </LinearLayout>
 
     </ScrollView>

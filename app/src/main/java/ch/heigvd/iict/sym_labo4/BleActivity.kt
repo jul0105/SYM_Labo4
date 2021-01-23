@@ -12,10 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import ch.heigvd.iict.sym_labo4.abstractactivies.BaseTemplateActivity
@@ -43,8 +40,14 @@ class BleActivity : BaseTemplateActivity() {
     private lateinit var scanResults: ListView
     private lateinit var emptyScanResults: TextView
 
+    private lateinit var hitButtonTextView: TextView
     private lateinit var temperatureTextView: TextView
     private lateinit var temperatureButton: Button
+    private lateinit var sendIntEditText : EditText
+    private lateinit var sendButton: Button
+    private lateinit var currDateTextView: TextView
+    private lateinit var syncDateButton: Button
+
     //menu elements
     private var scanMenuBtn: MenuItem? = null
     private var disconnectMenuBtn: MenuItem? = null
@@ -73,6 +76,11 @@ class BleActivity : BaseTemplateActivity() {
         // received data display
         temperatureTextView = findViewById(R.id.temperatureTextView)
         temperatureButton = findViewById(R.id.temperatureButton)
+        hitButtonTextView = findViewById(R.id.nbHitButton)
+        sendIntEditText = findViewById(R.id.sendIntEditText)
+        sendButton = findViewById(R.id.sendButton)
+        currDateTextView = findViewById(R.id.currDateTextView)
+        syncDateButton = findViewById(R.id.syncDateButton)
 
         //manage scanned item
         scanResultsAdapter = ResultsAdapter(this)
@@ -96,9 +104,21 @@ class BleActivity : BaseTemplateActivity() {
         temperatureButton.setOnClickListener({
             bleViewModel.readTemperature()
         })
+
+        sendButton.setOnClickListener({
+            var number = (sendIntEditText.text).toString().toInt()
+            bleViewModel.sendInt(number)
+        })
+
+        syncDateButton.setOnClickListener({
+            val calendar = Calendar.getInstance()
+            bleViewModel.syncDate(calendar)
+        })
         //ble events
         bleViewModel.isConnected.observe(this, { updateGui() })
         bleViewModel.temperature.observe(this, { updateGui() })
+        bleViewModel.click.observe(this, {updateGui()})
+        bleViewModel.date.observe(this, {updateGui()})
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -146,6 +166,8 @@ class BleActivity : BaseTemplateActivity() {
                 disconnectMenuBtn!!.isVisible = true
             }
             temperatureTextView.text = bleViewModel.temperature.value.toString();
+            hitButtonTextView.text = ("Number click : " + bleViewModel.click.value.toString());
+            currDateTextView.text = ("Current date : " + bleViewModel.date.value.toString());
         } else {
             operationPanel.visibility = View.GONE
             scanPanel.visibility = View.VISIBLE

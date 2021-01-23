@@ -84,6 +84,20 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
             return ble.readTemperature()
     }
 
+    fun sendInt(number: Int): Boolean {
+        if (!isConnected.value!! || temperatureChar == null)
+            return false
+        else
+            return ble.sendInt(number)
+    }
+
+    fun syncDate(calendar: Calendar): Boolean {
+        if(!isConnected.value!! || currentTimeChar == null)
+            return false
+        else
+            return ble.syncDate(calendar)
+    }
+
     private val bleConnectionObserver: ConnectionObserver = object : ConnectionObserver {
         override fun onDeviceConnecting(device: BluetoothDevice) {
             Log.d(TAG, "onDeviceConnecting")
@@ -240,22 +254,45 @@ class BleOperationsViewModel(application: Application) : AndroidViewModel(applic
         }
 
         fun readTemperature(): Boolean {
-            /*  TODO
-                on peut effectuer ici la lecture de la caractéristique température
-                la valeur récupérée sera envoyée à l'activité en utilisant le mécanisme
-                des MutableLiveData
-                On placera des méthodes similaires pour les autres opérations
-            */
-            return if (temperatureChar != null) {
+            if (temperatureChar != null) {
                 readCharacteristic(temperatureChar).with { _: BluetoothDevice, data: Data -> kotlin.run {
                     temperature.postValue(data.getIntValue(Data.FORMAT_UINT16, 0)?.div(10).toString())
-                    
-                    log(0,data.getIntValue(Data.FORMAT_UINT16, 0)?.div(10).toString())
                 }
                 }.enqueue()
-                true
+                return true
             } else {
-                false
+                return false
+            }
+        }
+
+        fun sendInt(number: Int): Boolean{
+            if(integerChar != null){
+                integerChar!!.setValue(number, Data.FORMAT_UINT32, 0)
+                writeCharacteristic(integerChar, integerChar!!.value).enqueue()
+                return true
+            }else{
+                return false;
+            }
+        }
+
+        fun syncDate(calendar: Calendar): Boolean{
+            val year = calendar.get(Calendar.YEAR)
+            var month = calendar.get(Calendar.MONTH) + 1
+            var day = calendar.get(Calendar.DAY_OF_MONTH)
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+            val second = calendar.get(Calendar.SECOND)
+            if(currentTimeChar != null){
+                currentTimeChar!!.setValue(year, Data.FORMAT_UINT16, 0)
+                currentTimeChar!!.setValue(month, Data.FORMAT_UINT8, 2)
+                currentTimeChar!!.setValue(day, Data.FORMAT_UINT8, 3)
+                currentTimeChar!!.setValue(hour, Data.FORMAT_UINT8, 4)
+                currentTimeChar!!.setValue(minute, Data.FORMAT_UINT8, 5)
+                currentTimeChar!!.setValue(second, Data.FORMAT_UINT8, 6)
+                writeCharacteristic(currentTimeChar, currentTimeChar!!.value).enqueue()
+                return true
+            }else{
+                return false
             }
         }
     }
