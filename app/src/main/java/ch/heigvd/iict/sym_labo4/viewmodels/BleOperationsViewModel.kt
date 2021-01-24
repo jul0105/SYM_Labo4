@@ -19,6 +19,7 @@ import java.util.*
  * Project: Labo4
  * Created by fabien.dutoit on 11.05.2019
  * Updated by fabien.dutoit on 06.11.2020
+ * Updated by Julien Béguin, Robin Cuénoud & Gaëtan Daubresse on 20.01.2021
  * (C) 2019 - HEIG-VD, IICT
  */
 class BleOperationsViewModel(application: Application) : AndroidViewModel(application) {
