@@ -49,7 +49,21 @@ Avec 8 bits on pourrait aller jusqu'a une température de 25.6 degré (256/10) c
 
 > Le niveau de charge de la pile est à présent indiqué uniquement sur l’écran du périphérique, mais nous souhaiterions que celui-ci puisse informer le smartphone sur son niveau de charge restante. Veuillez spécifier la(les) caractéristique(s) qui composerai(en)t un tel service, mis à disposition par le périphérique et permettant de communiquer le niveau de batterie restant via Bluetooth Low Energy. Pour chaque caractéristique, vous indiquerez les opérations supportées (lecture, écriture, notification, indication, etc.) ainsi que les données échangées et leur format.
 
-TODO
+Pour obtenir le niveau de charge du périphérique, nous pouvons nous baser sur la spécification GATT du battery service disponible à l’adresse suivante :  https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=245138
+
+| Opérations             | Exigences   |
+| ---------------------- | ----------- |
+| Broadcast              | exclu       |
+| Read                   | obligatoire |
+| Write without response | exclu       |
+| Write                  | exclu       |
+| Notify                 | optionnel   |
+| Indicate               | exclu       |
+| Signed write           | exclu       |
+| Reliable write         | exclu       |
+| Writable auxiliaries   | exclu       |
+
+Le service est lu conformément à la procédure GATT et retourne le pourcentage de niveau de batterie entre 0% et 100%. 
 
 
 ## 4. Conclusion
