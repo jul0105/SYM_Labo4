@@ -43,7 +43,8 @@ Sources :
 
 > La caractéristique permettant de lire la température retourne la valeur en degrés Celsius, multipliée par 10, sous la forme d’un entier non-signé de 16 bits. Quel est l’intérêt de procéder de la sorte ? Pourquoi ne pas échanger un nombre à virgule flottante de type float par exemple ?
 
-TODO
+La précision de la valeur est suffisante à 0.1 le capteur n'est probablement pas plus précis. Donc envoyer un entier puis le diviser par 10 permets d'utiliser moins de bit pour la précision de la virgule et ainsi de couvrir un plus grand interval avec le même nombre de bits. 
+Avec 8 bits on pourrait aller jusqu'a une température de 25.6 degré (256/10) ce qui est insufisant. 16 bits sont alors nécessaire. Il n'est pas possible de représenter des valeurs négative mais dans le cas d'utilisation la température est rarement en dessous de 0 car pour le laboratoire c'est à l'intérieur qu'on le fait sinon on a trop froid.. On pourrait choisir 16bits signé pour couvrir les valeurs de −3276,8 a 3276,7 ce qui pourrait couvrir les valeurs négative ainsi que toutes les positives probable. 
 
 
 > Le niveau de charge de la pile est à présent indiqué uniquement sur l’écran du périphérique, mais nous souhaiterions que celui-ci puisse informer le smartphone sur son niveau de charge restante. Veuillez spécifier la(les) caractéristique(s) qui composerai(en)t un tel service, mis à disposition par le périphérique et permettant de communiquer le niveau de batterie restant via Bluetooth Low Energy. Pour chaque caractéristique, vous indiquerez les opérations supportées (lecture, écriture, notification, indication, etc.) ainsi que les données échangées et leur format.
