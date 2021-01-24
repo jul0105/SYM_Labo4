@@ -68,4 +68,4 @@ Le service est lu conformément à la procédure GATT et retourne le pourcentage
 
 ## 4. Conclusion
 
-TODO
+Nous avons particulièrement apprécié ce laboratoire car il nous a permis de nous familiariser avec la communication BLE ainsi qu'avec les données environnementales. Le fait d'utiliser de vrais écrans externes a permis de rendre le travail plus concret. Nous avons également pu mieux nous rendre compte des possibilité liées à l'usage du protocole BLE. 
